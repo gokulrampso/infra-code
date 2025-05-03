@@ -1,0 +1,97 @@
+---
+# Ansible Playbook: install_k8s_worker.yml
+# Purpose: Install and configure Kubernetes (kubeadm, kubelet, kubectl) and Docker on all EC2 worker nodes.
+# This prepares the nodes to join a Kubernetes cluster (e.g., EKS worker nodes).
+
+- name: Install Kubernetes on EC2 Worker Nodes
+  hosts: workers # Target the 'workers' group from the inventory
+  become: yes # Run all tasks with sudo/root privileges
+  vars:
+    kubernetes_version: "1.29.0-00" # Specify the Kubernetes version to install
+
+  tasks:
+    # Install required system packages for Docker and Kubernetes
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    # Add Docker's official GPG key
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    # Add Docker's official APT repository
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    # Install Docker CE (Community Edition)
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    # Add Kubernetes GPG key
+    - name: Add Kubernetes apt key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    # Add Kubernetes APT repository
+    - name: Add Kubernetes repository
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+
+    # Install kubelet, kubeadm, and kubectl at the specified version
+    - name: Install kubelet, kubeadm, and kubectl
+      apt:
+        name:
+          - kubelet={{ kubernetes_version }}
+          - kubeadm={{ kubernetes_version }}
+          - kubectl={{ kubernetes_version }}
+        state: present
+        update_cache: yes
+
+    # Hold the Kubernetes packages at the installed version to prevent unintended upgrades
+    - name: Hold kubelet, kubeadm, and kubectl at current version
+      apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
+        allow_unauthenticated: yes
+        force: yes
+        autoremove: no
+        install_recommends: no
+        dpkg_options: "--force-confdef --force-confold"
+        force_apt_get: yes
+        only_upgrade: no
+        default_release: ""
+        package: "kubelet,kubeadm,kubectl"
+        hold: yes
+
+    # Enable and start the Docker service
+    - name: Enable and start Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    # Enable and start the kubelet service
+    - name: Enable kubelet
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
