@@ -10,19 +10,6 @@ variable "state_bucket" {
   type        = string
 }
 
-// EC2 instance type for standalone EC2 instances
-variable "instance_type" {
-  description = "EC2 instance type."
-  type        = string
-  default     = "t3.micro"
-}
-
-// AMI ID for EC2 instances
-variable "ami_id" {
-  description = "AMI ID for EC2 instances."
-  type        = string
-}
-
 // Name of the EKS cluster
 variable "eks_cluster_name" {
   description = "Name of the EKS cluster."

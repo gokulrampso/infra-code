@@ -26,4 +26,10 @@ variable "subnet_ids" {
 variable "node_instance_type" {
   description = "EC2 instance type for worker nodes."
   type        = string
+}
+
+// Number of EKS worker nodes
+variable "node_count" {
+  description = "Number of EKS worker nodes to create."
+  type        = number
 } 

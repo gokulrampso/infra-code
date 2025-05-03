@@ -8,7 +8,7 @@ resource "aws_eks_cluster" "this" {
   }
 }
 
-// This resource provisions a managed node group with 2 EC2 worker nodes for the EKS cluster
+// This resource provisions a managed node group with a configurable number of EC2 worker nodes for the EKS cluster
 resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name // Attach to the above EKS cluster
   node_group_name = "worker-group" // Name of the node group
@@ -16,9 +16,9 @@ resource "aws_eks_node_group" "this" {
   subnet_ids      = var.subnet_ids // Subnets for worker nodes
 
   scaling_config {
-    desired_size = 2 // Desired number of worker nodes
-    max_size     = 2 // Maximum number of worker nodes
-    min_size     = 2 // Minimum number of worker nodes
+    desired_size = var.node_count // Desired number of worker nodes
+    max_size     = var.node_count // Maximum number of worker nodes
+    min_size     = var.node_count // Minimum number of worker nodes
   }
 
   instance_types = [var.node_instance_type] // EC2 instance type for worker nodes

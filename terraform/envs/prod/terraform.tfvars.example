@@ -6,12 +6,6 @@ aws_region = "us-west-2"
 # S3 bucket for storing Terraform state
 state_bucket = "my-terraform-state-bucket"
 
-# EC2 instance type for standalone EC2 instances
-instance_type = "t3.micro"
-
-# AMI ID for EC2 instances (update with a valid AMI for your region)
-ami_id = "ami-0123456789abcdef0"
-
 # EKS cluster name
 eks_cluster_name = "prod-eks-cluster"
 
